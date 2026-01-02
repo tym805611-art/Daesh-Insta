@@ -25,7 +25,7 @@
 ### Termux
 ```bash
 pkg update && pkg install curl php git jq -y
-git clone https://github.com/YOURUSERNAME/Daesh-Insta.git
+git clone https://github.com/tym805611-art/Daesh-Insta.git
 cd Daesh-Insta
 chmod +x daesh_insta.sh
 ./daesh_insta.sh @target
@@ -35,7 +35,7 @@ chmod +x daesh_insta.sh
 ### Kali Linux
 ```bash
 sudo apt update && sudo apt install curl php git jq -y
-git clone https://github.com/YOURUSERNAME/Daesh-Insta.git
+git clone https://github.com/tym805611-art/Daesh-Insta.git
 cd Daesh-Insta
 chmod +x daesh_insta.sh
 ./daesh_insta.sh @target
@@ -80,7 +80,7 @@ bash
 #!/bin/bash
 ```bash
 echo "🔥 Installing Daesh Insta by Taym Allah..."
-git clone https://github.com/YOURUSERNAME/Daesh-Insta.git
+git clone https://github.com/tym805611-art/Daesh-Insta.git
 cd Daesh-Insta
 chmod +x daesh_insta.sh *.sh *.py
 echo "✅ Daesh Insta ready! Run: ./daesh_insta.sh @target"
