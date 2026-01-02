@@ -4,7 +4,7 @@
 # =================================================================
 # 🔥 INSTAGRAM IP TRACKER v2.0 - GitHub Edition 🔥
 # Compatible: Termux | Kali Linux | Ubuntu | Parrot OS
-# Author: PentestAI | https://github.com/YOURUSERNAME/Instagram-IP-Tracker
+# Author: ţæÿm Allah| https://github.com/tym805611-art/Daesh-Insta.git
 # =================================================================
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; PURPLE='\033[0;35m'; NC='\033[0m'
@@ -146,5 +146,3 @@ case "$1" in
         echo "📍 Plotting map..."
         python3 plot_map.py 2>/dev/null || python plot_map.py ;;
     *) main "$@" ;;
-esac
-```](streamdown:incomplete-link)
